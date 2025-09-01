@@ -1,0 +1,24 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: grpc-route
+spec:
+  parentRefs:
+  - name: my-gateway
+  rules:
+  # Health service routing
+  - matches:
+    - method:
+        service: grpc.health.v1.Health
+        method: Check
+    backendRefs:
+    - name: grpc-health-service
+      port: 50051
+  # Greeter service routing
+  - matches:
+    - method:
+        service: helloworld.Greeter
+        method: SayHello
+    backendRefs:
+    - name: grpc-greeter-service
+      port: 50051

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+  labels:
+    app: app1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app1
+  template:
+    metadata:
+      labels:
+        app: app1
+    spec:
+      containers:
+      - name: echo-server
+        image: ealen/echo-server:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: PORT
+          value: "80"
+        - name: ECHO__ENABLE__PPROF
+          value: "false"
+        - name: ECHO__ENABLE__HOST
+          value: "true"
+        - name: ECHO__ENABLE__HTTP
+          value: "true"
+        - name: ECHO__ENABLE__REQUEST
+          value: "true"
+        - name: ECHO__ENABLE__ENVIRONMENT
+          value: "false"
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "50m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1-service
+spec:
+  selector:
+    app: app1
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP

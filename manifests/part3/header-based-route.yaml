@@ -1,0 +1,41 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: my-route-headers
+spec:
+  parentRefs:
+  - name: my-gateway
+  hostnames:
+  - app1.local
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /admin
+    backendRefs:
+    - name: app2-service
+      port: 80
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api
+      headers:
+      - name: X-User-Type
+        value: premium
+    backendRefs:
+    - name: app2-service  # Premium users get admin backend
+      port: 80
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api  
+    backendRefs:
+    - name: app1-service  # Regular users get main backend
+      port: 80
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: app1-service
+      port: 80
